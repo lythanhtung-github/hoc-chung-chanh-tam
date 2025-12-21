@@ -52,7 +52,7 @@
 
        <!-- Thanh lựa chọn năm sẽ được render động -->
         <div class="mt-20 flex flex-col items-center">
-            <p class="text-stone-500 mb-6 font-serif italic text-sm">Lựa chọn khóa học theo năm</p>
+            <p class="text-stone-500 mb-6 font-serif italic text-sm">Danh sách thành viên theo năm</p>
             <div id="tabs-container" class="flex flex-wrap justify-center gap-3 p-2 bg-orange-50/50 rounded-2xl border border-orange-100">
                 <!-- Nút các năm sẽ tự động hiển thị ở đây -->
             </div>
@@ -63,7 +63,11 @@
         </footer>
     </div>
 
-    <script src="./js/data.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="./js/constant.js"></script>
+    <script src="./js/entity/member.js"></script>
+    <script src="./js/excelService.js"></script>
+    <script src="./js/memberService.js"></script>
     <script src="./js/script.js"></script>
 </body>
 </html>

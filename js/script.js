@@ -1,118 +1,172 @@
-let currentYear = '';
-let searchQuery = '';
-let sortType = 'none';
+/* =======================
+   STATE
+======================= */
+let currentYear = Constant.EMPTY;
+let searchQuery = Constant.EMPTY;
+let sortType = Constant.NONE;
 
-function renderTabs() {
-    const container = document.getElementById('tabs-container');
+/* =======================
+   INIT
+======================= */
+window.onload = async () => {
+    await renderTabs();
+    initLotusEffect();
+};
+
+/* =======================
+   RENDER TABS
+======================= */
+async function renderTabs() {
+    const container = document.getElementById("tabs-container");
     const years = MemberService.getAllYears();
-    container.innerHTML = '';
+
+    container.innerHTML = Constant.EMPTY;
+    if (!years.length) return;
 
     years.forEach((year, index) => {
-        const btn = document.createElement('button');
+        const btn = document.createElement("button");
         btn.innerText = year;
-        btn.className = `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold text-stone-600 hover:text-orange-600 ${index === 0 ? 'active' : ''}`;
-        btn.onclick = (e) => {
+        btn.className = getTabClass(index === 0);
+
+        btn.onclick = async () => {
             currentYear = year;
-            filterYear(year, e.target);
+            setActiveTab(btn);
+            await updateDisplay();
         };
+
         container.appendChild(btn);
     });
 
-    if (years.length > 0) {
-        currentYear = years[0];
-        updateDisplay();
-    }
+    currentYear = years[0];
+    await updateDisplay();
 }
 
-function updateDisplay() {
-    const grid = document.getElementById('member-grid');
-    grid.innerHTML = '';
-    
-    // Lấy một bản sao của mảng để tránh thay đổi dữ liệu gốc
-    let members = [...MemberService.getMembersByYear(currentYear)];
-    
-    // Lọc theo tên (Search)
-    if (searchQuery) {
-        members = members.filter(m => 
-            m.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-    }
+function getTabClass(isActive) {
+    return `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold
+            text-stone-600 hover:text-orange-600 ${isActive ? "active" : ""}`;
+}
 
-    // Sắp xếp (Sort)
-    if (sortType === 'name-asc') {
-        members.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-    } else if (sortType === 'name-desc') {
-        members.sort((a, b) => b.name.localeCompare(a.name, 'vi'));
-    }
-    // Nếu sortType === 'none', chúng ta không làm gì vì mảng đã ở thứ tự ban đầu
+function setActiveTab(activeBtn) {
+    document
+        .querySelectorAll(".tab-btn")
+        .forEach((b) => b.classList.remove("active"));
 
-    if (members.length === 0) {
-        grid.innerHTML = `
-            <div class="col-span-full py-20 text-center text-stone-400 italic">
-                Không tìm thấy thành viên nào phù hợp...
-            </div>
-        `;
+    activeBtn.classList.add("active");
+}
+
+/* =======================
+   RENDER MEMBERS
+======================= */
+async function updateDisplay() {
+    const grid = document.getElementById("member-grid");
+    grid.innerHTML = Constant.EMPTY;
+
+    let members = await MemberService.getMembersByYear(currentYear);
+
+    members = applySearch(members);
+    members = applySort(members);
+
+    if (!members.length) {
+        grid.innerHTML = getEmptyTemplate();
         return;
     }
 
-    members.forEach(m => {
-        const card = `
-            <div class="profile-card fade-in">
-                <div class="image-outer">
-                    <img src="${m.img}" alt="${m.name}" class="profile-img">
-                </div>
-                <h2 class="text-lg font-bold text-stone-800 mb-1 leading-tight">${m.name}</h2>
-                <p class="text-[10px] text-stone-500 mb-2 font-medium">${m.info}</p>
-                <span class="bg-tag px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-3">
-                    ${m.tag}
-                </span>
-                <p class="text-stone-500 text-xs leading-relaxed text-center italic font-serif">
-                    "${m.quote}"
-                </p>
+    grid.innerHTML = members.map(renderMemberCard).join("");
+}
+
+/* =======================
+   HELPERS
+======================= */
+function applySearch(members) {
+    if (!searchQuery) return members;
+
+    return members.filter((m) =>
+        m.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+}
+
+function applySort(members) {
+    if (sortType === "name-asc") {
+        return [...members].sort((a, b) => a.name.localeCompare(b.name, "vi"));
+    }
+
+    if (sortType === "name-desc") {
+        return [...members].sort((a, b) => b.name.localeCompare(a.name, "vi"));
+    }
+
+    return members;
+}
+
+function renderMemberCard(m) {
+    return `
+        <div class="profile-card fade-in">
+            <div class="image-outer">
+                <img src="${m.img}" alt="${m.name}" class="profile-img">
             </div>
-        `;
-        grid.innerHTML += card;
-    });
+            <h2 class="text-lg font-bold text-stone-800 mb-1">${m.name}</h2>
+            <p class="text-[10px] text-stone-500 mb-2">${m.info}</p>
+            <span class="bg-tag px-2 py-0.5 rounded-full text-[10px] font-bold">
+                ${m.tag}
+            </span>
+            <p class="text-stone-500 text-xs italic mt-2">
+                "${m.quote}"
+            </p>
+        </div>
+    `;
 }
 
-function filterYear(year, btn) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    updateDisplay();
+function getEmptyTemplate() {
+    return `
+        <div class="col-span-full py-20 text-center text-stone-400 italic">
+            Không tìm thấy thành viên nào phù hợp...
+        </div>
+    `;
 }
 
-// Lắng nghe sự kiện tìm kiếm
-document.getElementById('search-input').addEventListener('input', (e) => {
+/* =======================
+   EVENTS
+======================= */
+document.getElementById("search-input").addEventListener("input", async (e) => {
     searchQuery = e.target.value;
-    updateDisplay();
+    await updateDisplay();
 });
 
-// Lắng nghe sự kiện sắp xếp
-document.getElementById('sort-select').addEventListener('change', (e) => {
+document.getElementById("sort-select").addEventListener("change", async (e) => {
     sortType = e.target.value;
-    updateDisplay();
+    await updateDisplay();
 });
+
+/* =======================
+   LOTUS EFFECT
+======================= */
+function initLotusEffect() {
+    setInterval(createLotus, 1500);
+    for (let i = 0; i < 5; i++) {
+        setTimeout(createLotus, i * 500);
+    }
+}
 
 function createLotus() {
-    const lotus = document.createElement('div');
-    lotus.className = 'lotus-particle';
+    const lotus = document.createElement("div");
+    lotus.className = "lotus-particle";
+
     lotus.innerHTML = `
-        <svg width="30" height="30" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 10C50 10 35 40 10 50C35 60 50 90 50 90C50 90 65 60 90 50C65 40 50 10 50 10Z" fill="#fdba74" opacity="0.6"/>
-            <circle cx="50" cy="50" r="10" fill="#fb923c" opacity="0.4"/>
+        <svg width="30" height="30" viewBox="0 0 100 100">
+            <path d="M50 10C50 10 35 40 10 50
+                     C35 60 50 90 50 90
+                     C50 90 65 60 90 50
+                     C65 40 50 10 50 10Z"
+                  fill="#fdba74" opacity="0.6"/>
+            <circle cx="50" cy="50" r="10"
+                    fill="#fb923c" opacity="0.4"/>
         </svg>
     `;
-    lotus.style.left = Math.random() * 100 + 'vw';
-    const size = Math.random() * 20 + 20;
-    lotus.style.width = size + 'px';
-    const duration = Math.random() * 5 + 8;
-    lotus.style.animationDuration = duration + 's';
-    document.body.appendChild(lotus);
-    setTimeout(() => lotus.remove(), duration * 1000);
-}
 
-window.onload = () => {
-    renderTabs();
-    setInterval(createLotus, 1500);
-    for(let i=0; i<5; i++) setTimeout(createLotus, i * 500);
-};
+    lotus.style.left = Math.random() * 100 + "vw";
+    const size = Math.random() * 20 + 20;
+    lotus.style.width = size + "px";
+    lotus.style.animationDuration = Math.random() * 5 + 8 + "s";
+
+    document.body.appendChild(lotus);
+    setTimeout(() => lotus.remove(), 10000);
+}
