@@ -5,7 +5,9 @@ body {
     overflow-x: hidden;
 }
 
-h1, h2, .font-serif {
+h1,
+h2,
+.font-serif {
     font-family: 'Noto Serif Vietnamese', serif;
 }
 
@@ -56,6 +58,7 @@ h1, h2, .font-serif {
     transition: all 0.3s ease;
     cursor: pointer;
 }
+
 .tab-btn.active {
     color: #ea580c;
     background-color: white;
@@ -73,10 +76,23 @@ h1, h2, .font-serif {
 }
 
 @keyframes riseUp {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-    20% { opacity: 0.5; }
-    80% { opacity: 0.5; }
-    100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.5;
+    }
+
+    80% {
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translateY(-110vh) rotate(360deg);
+        opacity: 0;
+    }
 }
 
 .blob {
@@ -93,12 +109,21 @@ h1, h2, .font-serif {
 .fade-in {
     animation: fadeIn 0.5s ease-in-out;
 }
+
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
     outline: none;
     border-color: #ea580c;
     box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.1);
