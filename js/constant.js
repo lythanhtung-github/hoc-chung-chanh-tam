@@ -5,6 +5,7 @@ const Constant = (() => {
         ASC: 'asc',
         DESC: 'desc',
         NAME_ASC: 'name-asc',
-        NAME_DESC: 'name-desc'
+        NAME_DESC: 'name-desc',
+        ITEMS_PER_PAGE: 8
     });
 })();

@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Học Chúng Chánh Tâm - Tự viện Phước Duyên</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="icon" href="data:,">
         <link
             href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Noto+Serif+Vietnamese:wght@400;700&display=swap"
             rel="stylesheet"
@@ -44,12 +44,7 @@
                         />
                     </svg>
                 </div>
-                <!-- Tooltip -->
-                <span
-                    id="music-tooltip"
-                    class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-stone-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest font-bold"
-                    >Bật nhạc thiền</span
-                >
+            <span id="music-tooltip" class="music-tooltip-el absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-stone-800 text-white text-[10px] px-2 py-1 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest font-bold hidden md:block"></span>
             </button>
             <!-- Audio Element -->
             <audio id="bg-music" loop>
@@ -80,7 +75,7 @@
                 ></div>
             </header>
 
-            <!-- Thanh Tìm kiếm và Sắp xếp -->
+            <!-- Search and sort button -->
             <div
                 class="mb-8 flex flex-col md:flex-row gap-4 justify-between items-center bg-white/50 p-4 rounded-2xl border border-orange-100 backdrop-blur-sm"
             >
@@ -131,6 +126,11 @@
                 <!-- Render member list from Js -->
             </div>
 
+            <!-- Pagination buttons -->
+            <div id="pagination" class="mt-12 flex justify-center items-center gap-2">
+                <!-- Pagination buttons injected here -->
+            </div>
+
             <!-- Thanh lựa chọn năm sẽ được render động -->
             <div class="mt-20 flex flex-col items-center">
                 <p class="text-stone-500 mb-6 font-serif italic text-sm">
@@ -140,7 +140,7 @@
                     id="tabs-container"
                     class="flex flex-wrap justify-center gap-3 p-2 bg-orange-50/50 rounded-2xl border border-orange-100"
                 >
-                    <!-- Nút các năm sẽ tự động hiển thị ở đây -->
+                    <!-- Show button years in here -->
                 </div>
             </div>
 
@@ -150,6 +150,8 @@
                 <p>© Học chúng Chánh Tâm - Tự viện Phước Duyên, Huế</p>
             </footer>
         </div>
+
+        <script src="https://cdn.tailwindcss.com"></script>
 
         <!-- Thư viện -->
         <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>

@@ -5,6 +5,7 @@ let currentYear = Constant.EMPTY;
 let searchQuery = Constant.EMPTY;
 let sortType = Constant.NONE;
 let player; // YouTube player object
+let currentPage = 1;
 
 /* =======================
     INIT
@@ -36,9 +37,9 @@ function initMusic() {
 function updateMusicUI(isPlaying) {
     const icon = document.getElementById("music-icon");
     const tooltip = document.getElementById("music-tooltip");
-    
+
     if (isPlaying) {
-        icon.classList.add('music-pulse');
+        icon.classList.add("music-pulse");
         tooltip.textContent = "Tắt nhạc thiền";
         icon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -46,7 +47,7 @@ function updateMusicUI(isPlaying) {
             </svg>
         `;
     } else {
-        icon.classList.remove('music-pulse');
+        icon.classList.remove("music-pulse");
         tooltip.textContent = "Bật nhạc thiền";
         icon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -58,55 +59,42 @@ function updateMusicUI(isPlaying) {
 }
 
 /* =======================
-   RENDER TABS
+    RENDER TABS
 ======================= */
 async function renderTabs() {
     const container = document.getElementById("tabs-container");
     const years = MemberService.getAllYears();
-
     container.innerHTML = Constant.EMPTY;
     if (!years.length) return;
 
     years.forEach((year, index) => {
         const btn = document.createElement("button");
         btn.innerText = year;
-        btn.className = getTabClass(index === 0);
-
+        btn.className = `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold text-stone-600 hover:text-orange-600 transition-all ${index === 0 ? "active" : ""}`;
         btn.onclick = async () => {
             currentYear = year;
-            setActiveTab(btn);
+            currentPage = 1;
+            document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
             await updateDisplay();
         };
-
         container.appendChild(btn);
     });
-
     currentYear = years[0];
     await updateDisplay();
 }
 
-function getTabClass(isActive) {
-    return `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold
-            text-stone-600 hover:text-orange-600 ${isActive ? "active" : ""}`;
-}
-
-function setActiveTab(activeBtn) {
-    document
-        .querySelectorAll(".tab-btn")
-        .forEach((b) => b.classList.remove("active"));
-
-    activeBtn.classList.add("active");
-}
-
 /* =======================
-   RENDER MEMBERS
+    RENDER MEMBERS WITH PAGINATION
 ======================= */
 async function updateDisplay() {
     const grid = document.getElementById("member-grid");
+    const paginContainer = document.getElementById("pagination");
     grid.innerHTML = Constant.EMPTY;
+    paginContainer.innerHTML = Constant.EMPTY;
 
     let members = await MemberService.getMembersByYear(currentYear);
-
+    console.log(members)
     members = applySearch(members);
     members = applySort(members);
 
@@ -115,7 +103,36 @@ async function updateDisplay() {
         return;
     }
 
-    grid.innerHTML = members.map(renderMemberCard).join("");
+    // Phân trang
+    const totalPages = Math.ceil(members.length / Constant.ITEMS_PER_PAGE);
+    const start = (currentPage - 1) * Constant.ITEMS_PER_PAGE;
+    const paginatedItems = members.slice(
+        start,
+        start + Constant.ITEMS_PER_PAGE
+    );
+
+    grid.innerHTML = paginatedItems.map(renderMemberCard).join("");
+
+    if (totalPages > 1) {
+        renderPaginationUI(totalPages);
+    }
+}
+
+function renderPaginationUI(totalPages) {
+    const container = document.getElementById("pagination");
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        btn.className = `page-link w-10 h-10 rounded-lg border border-orange-200 flex items-center justify-center font-bold text-sm transition-all hover:bg-orange-50 ${
+            i === currentPage ? "active" : "bg-white text-stone-600"
+        }`;
+        btn.onclick = async () => {
+            currentPage = i;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            await updateDisplay();
+        };
+        container.appendChild(btn);
+    }
 }
 
 /* =======================
