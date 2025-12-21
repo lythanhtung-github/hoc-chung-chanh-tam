@@ -15,7 +15,9 @@ const ExcelService = (() => {
     const loadWorkbook = async () => {
         if (workbookCache) return workbookCache;
 
-        const response = await fetch(EXCEL_URL);
+        const response = await fetch(EXCEL_URL, {
+            cache: 'no-store'
+        });
         if (!response.ok) {
             throw new Error('Không thể tải file Excel');
         }
