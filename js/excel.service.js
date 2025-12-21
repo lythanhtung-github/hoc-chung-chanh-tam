@@ -2,7 +2,7 @@ const ExcelService = (() => {
     /* =======================
        CONFIG
     ======================= */
-    const EXCEL_URL = './data/DATA.xlsx';
+    const EXCEL_URL = "./data/DATA.xlsx";
 
     /* =======================
        STATE
@@ -16,14 +16,14 @@ const ExcelService = (() => {
         if (workbookCache) return workbookCache;
 
         const response = await fetch(EXCEL_URL, {
-            cache: 'no-store'
+            cache: "no-store",
         });
         if (!response.ok) {
-            throw new Error('Không thể tải file Excel');
+            throw new Error("Không thể tải file Excel");
         }
 
         const buffer = await response.arrayBuffer();
-        workbookCache = XLSX.read(buffer, { type: 'array' });
+        workbookCache = XLSX.read(buffer, { type: "array" });
 
         return workbookCache;
     };
@@ -35,16 +35,15 @@ const ExcelService = (() => {
             return [];
         }
 
-        return XLSX.utils.sheet_to_json(
-            workbook.Sheets[sheetName],
-            { header: 1 }
-        );
+        return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            header: 1,
+        });
     };
 
     /* =======================
        PUBLIC API
     ======================= */
     return {
-        readSheet: getSheet
+        readSheet: getSheet,
     };
 })();

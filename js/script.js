@@ -3,21 +3,51 @@
 ======================= */
 let currentYear = Constant.EMPTY;
 let searchQuery = Constant.EMPTY;
+let groupFilter = Constant.ALL;
 let sortType = Constant.NONE;
-let player; // YouTube player object
+let itemsPerPage = Constant.ITEMS_PER_PAGE;
 let currentPage = 1;
 
 /* =======================
-    INIT
+    INITIALIZATION
 ======================= */
 window.onload = async () => {
     await renderTabs();
     initLotusEffect();
     initMusic();
+    initEvents();
 };
 
 /* =======================
-    MUSIC LOGIC
+    EVENT LISTENERS
+======================= */
+function initEvents() {
+    document.getElementById("search-input").addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        currentPage = 1;
+        updateDisplay();
+    });
+
+    document.getElementById("group-filter").addEventListener("change", (e) => {
+        groupFilter = e.target.value;
+        currentPage = 1;
+        updateDisplay();
+    });
+
+    document.getElementById("sort-select").addEventListener("change", (e) => {
+        sortType = e.target.value;
+        updateDisplay();
+    });
+
+    document.getElementById("limit-select").addEventListener("change", (e) => {
+        itemsPerPage = parseInt(e.target.value);
+        currentPage = 1;
+        updateDisplay();
+    });
+}
+
+/* =======================
+    MUSIC CONTROL LOGIC
 ======================= */
 function initMusic() {
     const audio = document.getElementById("bg-music");
@@ -34,6 +64,7 @@ function initMusic() {
     };
 }
 
+/* Update music button UI based on play state */
 function updateMusicUI(isPlaying) {
     const icon = document.getElementById("music-icon");
     const tooltip = document.getElementById("music-tooltip");
@@ -59,7 +90,7 @@ function updateMusicUI(isPlaying) {
 }
 
 /* =======================
-    RENDER TABS
+    YEAR TABS RENDERING
 ======================= */
 async function renderTabs() {
     const container = document.getElementById("tabs-container");
@@ -70,11 +101,15 @@ async function renderTabs() {
     years.forEach((year, index) => {
         const btn = document.createElement("button");
         btn.innerText = year;
-        btn.className = `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold text-stone-600 hover:text-orange-600 transition-all ${index === 0 ? "active" : ""}`;
+        btn.className = `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold text-stone-600 hover:text-orange-600 transition-all ${
+            index === 0 ? "active" : ""
+        }`;
         btn.onclick = async () => {
             currentYear = year;
             currentPage = 1;
-            document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+            document
+                .querySelectorAll(".tab-btn")
+                .forEach((b) => b.classList.remove("active"));
             btn.classList.add("active");
             await updateDisplay();
         };
@@ -85,59 +120,111 @@ async function renderTabs() {
 }
 
 /* =======================
-    RENDER MEMBERS WITH PAGINATION
+    MEMBER LIST & PAGINATION
 ======================= */
 async function updateDisplay() {
     const grid = document.getElementById("member-grid");
-    const paginContainer = document.getElementById("pagination");
-    grid.innerHTML = Constant.EMPTY;
-    paginContainer.innerHTML = Constant.EMPTY;
+    const paginNumbers = document.getElementById("pagination-numbers");
+    const paginInfo = document.getElementById("pagination-info");
 
     let members = await MemberService.getMembersByYear(currentYear);
-    console.log(members)
-    members = applySearch(members);
+
+    // Update group filter options based on current year
+    updateGroupOptions(members);
+
+    // Apply filters and sorting
+    members = applyFilters(members);
     members = applySort(members);
 
     if (!members.length) {
         grid.innerHTML = getEmptyTemplate();
+        paginNumbers.innerHTML = "";
+        paginInfo.innerHTML = "";
         return;
     }
 
-    // Phân trang
-    const totalPages = Math.ceil(members.length / Constant.ITEMS_PER_PAGE);
-    const start = (currentPage - 1) * Constant.ITEMS_PER_PAGE;
-    const paginatedItems = members.slice(
-        start,
-        start + Constant.ITEMS_PER_PAGE
-    );
+    // Pagination logic
+    const totalItems = members.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const paginatedItems = members.slice(startIdx, startIdx + itemsPerPage);
 
     grid.innerHTML = paginatedItems.map(renderMemberCard).join("");
 
-    if (totalPages > 1) {
-        renderPaginationUI(totalPages);
+    // Render pagination UI
+    renderPaginationUI(totalPages, totalItems, startIdx, paginatedItems.length);
+}
+
+/* =======================
+    FILTER & SORT HELPERS
+======================= */
+function updateGroupOptions(members) {
+    console.log(members);
+    const select = document.getElementById("group-filter");
+    const currentVal = select.value;
+    const groups = [
+        ...new Set(
+            members.flatMap((m) =>
+                m.group ? m.group.split(",").map((g) => g.trim()) : []
+            )
+        ),
+    ];
+
+    select.innerHTML = '<option value="all">Tất cả Nhóm</option>';
+    groups.forEach((g) => {
+        const opt = document.createElement("option");
+        opt.value = g;
+        opt.textContent = g;
+        if (g === currentVal) opt.selected = true;
+        select.appendChild(opt);
+    });
+
+    // Reset if the previous group no longer exists
+    if (currentVal !== "all" && !groups.includes(currentVal)) {
+        groupFilter = Constant.ALL;
+        select.value = "all";
     }
 }
 
-function renderPaginationUI(totalPages) {
-    const container = document.getElementById("pagination");
+function applyFilters(members) {
+    return members.filter((item) => {
+        const matchesSearch = item.name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase());
+        const isAllGroup =
+            groupFilter === Constant.ALL || groupFilter === "all";
+        const matchesGroup =
+            isAllGroup ||
+            item.group.toLowerCase().includes(groupFilter.toLowerCase());
+        return matchesSearch && matchesGroup;
+    });
+}
+
+function renderPaginationUI(totalPages, totalItems, startIdx, currentCount) {
+    const container = document.getElementById("pagination-numbers");
+    const info = document.getElementById("pagination-info");
+    container.innerHTML = "";
+
     for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement("button");
         btn.innerText = i;
         btn.className = `page-link w-10 h-10 rounded-lg border border-orange-200 flex items-center justify-center font-bold text-sm transition-all hover:bg-orange-50 ${
             i === currentPage ? "active" : "bg-white text-stone-600"
         }`;
-        btn.onclick = async () => {
+        btn.onclick = () => {
             currentPage = i;
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            await updateDisplay();
+            window.scrollTo({ top: 300, behavior: "smooth" });
+            updateDisplay();
         };
         container.appendChild(btn);
     }
+
+    const endIdx = startIdx + currentCount;
+    info.innerText = `Hiển thị ${
+        startIdx + 1
+    } - ${endIdx} trên tổng số ${totalItems} thành viên`;
 }
 
-/* =======================
-   HELPERS
-======================= */
 function applySearch(members) {
     if (!searchQuery) return members;
 
@@ -158,19 +245,22 @@ function applySort(members) {
     return members;
 }
 
+/* =======================
+    UI RENDER HELPERS
+======================= */
 function renderMemberCard(m) {
     return `
         <div class="profile-card fade-in">
             <div class="image-outer">
-                <img src="${m.img}" alt="${m.name}" class="profile-img">
+                <img src="${m.img}" alt="${m.fullName}" class="profile-img">
             </div>
-            <h2 class="text-lg font-bold text-stone-800 mb-1">${m.name}</h2>
-            <p class="text-[10px] text-stone-500 mb-2">${m.info}</p>
+            <h2 class="text-lg font-bold text-stone-800 mb-1">${m.fullName}</h2>
+            <p class="text-[10px] text-stone-500 mb-2">${m.position}</p>
             <span class="bg-tag px-2 py-0.5 rounded-full text-[10px] font-bold">
-                ${m.tag}
+                ${m.group}
             </span>
             <p class="text-stone-500 text-xs italic mt-2">
-                "${m.quote}"
+                "${m.note}"
             </p>
         </div>
     `;
@@ -198,7 +288,7 @@ document.getElementById("sort-select").addEventListener("change", async (e) => {
 });
 
 /* =======================
-   LOTUS EFFECT
+    LOTUS BACKGROUND EFFECT
 ======================= */
 function initLotusEffect() {
     setInterval(createLotus, 1500);

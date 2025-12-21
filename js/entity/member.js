@@ -1,10 +1,14 @@
+/**
+ * Member Class
+ */
 class Member {
-    constructor(id, name, info, tag, quote, img) {
+    constructor(id, fullName, name, position, group, note, img) {
         this.id = id;
+        this.fullName = fullName;
         this.name = name;
-        this.info = info;
-        this.tag = tag;
-        this.quote = quote;
+        this.position = position;
+        this.group = group;
+        this.note = note;
         this.img = img;
     }
 }

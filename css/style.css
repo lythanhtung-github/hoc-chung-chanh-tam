@@ -129,10 +129,14 @@ select:focus {
     box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.1);
 }
 
-.page-link.active { background-color: #f97316; color: white; border-color: #f97316; }
+.page-link.active {
+    background-color: #f97316;
+    color: white;
+    border-color: #f97316;
+}
 
 @media (hover: hover) {
-    .music-btn-group:hover .music-tooltip-el {
+    #music-toggle:hover .music-tooltip-el {
         opacity: 1;
     }
 }

@@ -4,25 +4,30 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Học Chúng Chánh Tâm - Tự viện Phước Duyên</title>
-        <link rel="icon" href="data:,">
+        <!-- Favicon (empty to prevent 404 error) -->
+        <link rel="icon" href="data:," />
+        <!-- Google Fonts -->
         <link
             href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Noto+Serif+Vietnamese:wght@400;700&display=swap"
             rel="stylesheet"
         />
+        <!-- Main Styles -->
         <link rel="stylesheet" href="./css/style.css" />
     </head>
     <body class="p-4 md:p-12">
+        <!-- Decorative background blobs -->
         <div class="blob top-0 right-0"></div>
         <div class="blob bottom-0 left-0"></div>
 
-        <!-- Music Player Control -->
+        <!-- Music Player -->
         <div class="fixed bottom-8 right-8 z-50">
             <button
                 id="music-toggle"
                 class="bg-white p-4 rounded-full shadow-lg border border-orange-100 text-orange-600 hover:text-orange-700 hover:shadow-xl transition-all group relative flex items-center justify-center"
             >
+                <!-- Music icon container -->
                 <div id="music-icon" class="flex items-center justify-center">
-                    <!-- Mặc định: Icon Loa đang tắt (Gạch chéo) -->
+                    <!-- Default state: muted speaker icon -->
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-6 w-6"
@@ -44,9 +49,13 @@
                         />
                     </svg>
                 </div>
-            <span id="music-tooltip" class="music-tooltip-el absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-stone-800 text-white text-[10px] px-2 py-1 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest font-bold hidden md:block"></span>
+                <!-- Tooltip text -->
+                <span
+                    id="music-tooltip"
+                    class="music-tooltip-el absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-stone-800 text-white text-[10px] px-2 py-1 rounded opacity-0 pointer-events-none transition-opacity whitespace-nowrap uppercase tracking-widest font-bold hidden md:block"
+                ></span>
             </button>
-            <!-- Audio Element -->
+            <!-- Background music audio -->
             <audio id="bg-music" loop>
                 <source
                     src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-13.mp3"
@@ -55,6 +64,9 @@
             </audio>
         </div>
         <div class="max-w-7xl mx-auto">
+            <!-- =======================
+            PAGE HEADER
+            ======================== -->
             <header class="text-center mb-12">
                 <div
                     class="inline-block px-4 py-1 mb-4 text-orange-700 bg-orange-100 rounded-full text-sm font-medium"
@@ -75,63 +87,88 @@
                 ></div>
             </header>
 
-            <!-- Search and sort button -->
+            <!-- =======================
+                SEARCH, FILTER & SORT
+            ======================== -->
             <div
-                class="mb-8 flex flex-col md:flex-row gap-4 justify-between items-center bg-white/50 p-4 rounded-2xl border border-orange-100 backdrop-blur-sm"
+                class="mb-8 flex flex-col gap-4 bg-white/50 p-6 rounded-2xl border border-orange-100 backdrop-blur-sm"
             >
-                <div class="relative w-full md:w-96">
-                    <input
-                        type="text"
-                        id="search-input"
-                        placeholder="Tìm tên thành viên..."
-                        class="w-full pl-10 pr-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700"
-                    />
-                    <div class="absolute left-3 top-2.5 text-orange-400">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="search-input"
+                            placeholder="Tìm tên thành viên..."
+                            class="w-full pl-10 pr-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700"
+                        />
+                        <div class="absolute left-3 top-2.5 text-orange-400">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                                />
+                            </svg>
+                        </div>
                     </div>
-                </div>
-                <div class="flex items-center gap-2 w-full md:w-auto">
-                    <span
-                        class="text-stone-500 text-sm font-medium whitespace-nowrap"
-                        >Sắp xếp:</span
+
+                    <!-- Group Filter -->
+                    <select
+                        id="group-filter"
+                        class="w-full px-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700 cursor-pointer"
                     >
+                        <option value="all">Tất cả Nhóm</option>
+                    </select>
+
+                    <!-- Sort -->
                     <select
                         id="sort-select"
-                        class="w-full md:w-48 px-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700 cursor-pointer"
+                        class="w-full px-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700 cursor-pointer"
                     >
-                        <option value="none">Mặc định</option>
+                        <option value="none">Sắp xếp: Mặc định</option>
                         <option value="name-asc">Tên (A-Z)</option>
                         <option value="name-desc">Tên (Z-A)</option>
+                    </select>
+
+                    <!-- Page Size -->
+                    <select
+                        id="limit-select"
+                        class="w-full px-4 py-2 rounded-xl border border-orange-200 bg-white/80 text-stone-700 cursor-pointer"
+                    >
+                        <option value="4">Hiển thị: 4</option>
+                        <option value="8" selected>Hiển thị: 8</option>
+                        <option value="12">Hiển thị: 12</option>
+                        <option value="20">Hiển thị: 20</option>
                     </select>
                 </div>
             </div>
 
+            <!-- Member Grid -->
             <div
                 id="member-grid"
                 class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[400px]"
             >
-                <!-- Render member list from Js -->
+                <!-- JS Injection -->
             </div>
 
-            <!-- Pagination buttons -->
-            <div id="pagination" class="mt-12 flex justify-center items-center gap-2">
-                <!-- Pagination buttons injected here -->
+            <!-- Pagination -->
+            <div id="pagination" class="mt-12 flex flex-col items-center gap-4">
+                <div
+                    id="pagination-numbers"
+                    class="flex justify-center items-center gap-2"
+                ></div>
+                <p id="pagination-info" class="text-stone-400 text-xs"></p>
             </div>
 
-            <!-- Thanh lựa chọn năm sẽ được render động -->
+            <!-- Year Tabs -->
             <div class="mt-20 flex flex-col items-center">
                 <p class="text-stone-500 mb-6 font-serif italic text-sm">
                     Danh sách thành viên theo năm
@@ -140,7 +177,7 @@
                     id="tabs-container"
                     class="flex flex-wrap justify-center gap-3 p-2 bg-orange-50/50 rounded-2xl border border-orange-100"
                 >
-                    <!-- Show button years in here -->
+                    <!-- JS Injection -->
                 </div>
             </div>
 
@@ -151,17 +188,19 @@
             </footer>
         </div>
 
+        <!-- Tailwind CSS CDN (development only) -->
         <script src="https://cdn.tailwindcss.com"></script>
 
-        <!-- Thư viện -->
+        <!-- Libraries -->
         <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 
+        <!-- Constants -->
         <script src="./js/constant.js"></script>
 
-        <!-- model -->
+        <!-- Model -->
         <script src="./js/entity/member.js"></script>
 
-        <!-- service -->
+        <!-- Service -->
         <script src="./js/excel.service.js"></script>
         <script src="./js/member.service.js"></script>
 
