@@ -30,15 +30,20 @@ const MemberService = (() => {
      * @param {*} year
      * @returns
      */
-    const loadYear = async (year) => {
+     const loadYear = async (year) => {
         if (CACHE[year]) return CACHE[year];
-
+    
         const rows = await ExcelService.readSheet(String(year));
         if (!rows || rows.length <= 1) return [];
-
-        const members = rows.slice(1).map(mapRowToMember);
+    
+        const members = rows
+            .slice(1)
+            .filter(row =>
+                row.some(cell => cell !== null && cell !== undefined && cell !== "")
+            )
+            .map(mapRowToMember);
+    
         CACHE[year] = members;
-
         return members;
     };
 

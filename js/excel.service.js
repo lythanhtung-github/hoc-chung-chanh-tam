@@ -2,7 +2,7 @@ const ExcelService = (() => {
     /* =======================
        CONFIG
     ======================= */
-    const EXCEL_URL = "./data/DATA.xlsx";
+    const EXCEL_URL = Constant.DATA_EXCEL_URL;
 
     /* =======================
        STATE
