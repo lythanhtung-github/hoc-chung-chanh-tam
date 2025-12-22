@@ -252,14 +252,14 @@ function renderMemberCard(m) {
     return `
         <div class="profile-card fade-in">
             <div class="image-outer">
-                <img src="${m.img}" alt="${m.fullName}" class="profile-img">
+                <img src="${m.img}" loading="lazy" alt="${m.fullName}" class="profile-img">
             </div>
-            <h2 class="text-lg font-bold text-stone-800 mb-1">${m.fullName}</h2>
-            <p class="text-[10px] text-stone-500 mb-2">${m.position}</p>
-            <span class="bg-tag px-2 py-0.5 rounded-full text-[10px] font-bold">
+            <h2 class="text-lg font-bold text-stone-800 mb-1 text-center">${m.fullName}</h2>
+            <p class="text-[10px] text-stone-500 mb-2 text-center">${m.position}</p>
+            <span class="bg-tag px-2 py-0.5 rounded-full text-[10px] font-bold text-center">
                 ${m.group}
             </span>
-            <p class="text-stone-500 text-xs italic mt-2">
+            <p class="text-stone-500 text-xs italic mt-2 text-center">
                 "${m.note}"
             </p>
         </div>
