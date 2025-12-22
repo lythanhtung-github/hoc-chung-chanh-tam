@@ -188,7 +188,7 @@ function updateGroupOptions(members) {
 
 function applyFilters(members) {
     return members.filter((item) => {
-        const matchesSearch = item.name
+        const matchesSearch = item.fullName
             .toLowerCase()
             .includes(searchQuery.toLowerCase());
         const isAllGroup =
