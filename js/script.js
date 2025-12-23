@@ -300,7 +300,13 @@ function createPageBtn(text, targetPage, disabled, active = false) {
 function updateGroupOptions(members) {
     const select = document.getElementById("group-filter");
     const currentVal = select.value;
-    const groups = [...new Set(members.map((m) => m.group))];
+    const groups = [
+        ...new Set(
+            members.flatMap((m) =>
+                m.group ? m.group.split(",").map((g) => g.trim()) : []
+            )
+        ),
+    ];
     select.innerHTML = '<option value="all">Tất cả Nhóm</option>';
     groups.forEach((g) => {
         const opt = document.createElement("option");
