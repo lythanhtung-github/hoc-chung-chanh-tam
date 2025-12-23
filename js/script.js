@@ -159,7 +159,6 @@ async function updateDisplay() {
     FILTER & SORT HELPERS
 ======================= */
 function updateGroupOptions(members) {
-    console.log(members);
     const select = document.getElementById("group-filter");
     const currentVal = select.value;
     const groups = [
