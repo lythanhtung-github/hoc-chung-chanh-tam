@@ -351,8 +351,9 @@ function applySort(members) {
 function renderMemberCard(m) {
     return `
         <div class="profile-card fade-in">
-            <div class="image-outer">
-                <img src="${m.img}" loading="lazy" alt="${m.fullName}" class="profile-img">
+            <div class="image-outer img-skeleton">
+                <img src="${m.img}" loading="lazy" alt="${m.fullName}" class="profile-img opacity-0" width="150" height="150"
+                onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('img-skeleton');">
             </div>
             <h2 class="text-lg font-bold text-stone-800 mb-1 text-center">${m.fullName}</h2>
             <p class="text-[10px] text-stone-500 mb-2 text-center">${m.position}</p>
