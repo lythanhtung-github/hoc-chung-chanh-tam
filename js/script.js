@@ -12,10 +12,25 @@ let currentPage = 1;
     INITIALIZATION
 ======================= */
 window.onload = async () => {
-    await renderTabs();
+    await wrapWithLoader(async () => {
+        renderTabs();
+    });
+
     initLotusEffect();
     initMusic();
     initEvents();
+};
+
+const showLoader = () =>
+    document.getElementById("global-loader").classList.remove("fade-out");
+const hideLoader = () =>
+    document.getElementById("global-loader").classList.add("fade-out");
+
+const wrapWithLoader = async (fn) => {
+    showLoader();
+    await new Promise((r) => setTimeout(r, 400));
+    await fn();
+    hideLoader();
 };
 
 /* =======================
@@ -23,26 +38,34 @@ window.onload = async () => {
 ======================= */
 function initEvents() {
     document.getElementById("search-input").addEventListener("input", (e) => {
-        searchQuery = e.target.value;
-        currentPage = 1;
-        updateDisplay();
+        wrapWithLoader(() => {
+            searchQuery = e.target.value;
+            currentPage = 1;
+            updateDisplay();
+        });
     });
 
     document.getElementById("group-filter").addEventListener("change", (e) => {
-        groupFilter = e.target.value;
-        currentPage = 1;
-        updateDisplay();
+        wrapWithLoader(() => {
+            groupFilter = e.target.value;
+            currentPage = 1;
+            updateDisplay();
+        });
     });
 
     document.getElementById("sort-select").addEventListener("change", (e) => {
-        sortType = e.target.value;
-        updateDisplay();
+        wrapWithLoader(() => {
+            sortType = e.target.value;
+            updateDisplay();
+        });
     });
 
     document.getElementById("limit-select").addEventListener("change", (e) => {
-        itemsPerPage = parseInt(e.target.value);
-        currentPage = 1;
-        updateDisplay();
+        wrapWithLoader(() => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            updateDisplay();
+        });
     });
 }
 
@@ -185,6 +208,109 @@ function updateGroupOptions(members) {
     }
 }
 
+/* =======================
+   PAGINATION UPDATE: SHOW ONLY 3 PAGE NUMBERS
+======================= */
+function renderPaginationUI(totalPages, totalItems, startIdx, currentCount) {
+    const container = document.getElementById("pagination-numbers");
+    const info = document.getElementById("pagination-info");
+    container.innerHTML = "";
+
+    // If there is only one page, show all items info and stop
+    if (totalPages <= 1) {
+        info.innerText = `Hiển thị tất cả ${totalItems} thành viên`;
+        return;
+    }
+
+    // "Previous" button
+    container.appendChild(
+        createPageBtn("<", currentPage - 1, currentPage === 1)
+    );
+
+    // Limit maximum visible page numbers to 3
+    const maxVisible = 3;
+    let startPage, endPage;
+
+    if (totalPages <= maxVisible) {
+        // If total pages are less than or equal to max visible
+        startPage = 1;
+        endPage = totalPages;
+    } else {
+        // Try to keep current page in the center
+        startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        endPage = startPage + maxVisible - 1;
+        // Adjust if exceeding total pages
+        if (endPage > totalPages) {
+            endPage = totalPages;
+            startPage = endPage - maxVisible + 1;
+        }
+    }
+
+    // Show leading "..." if pages before startPage exist
+    if (startPage > 1) {
+        const dot = document.createElement("span");
+        dot.innerText = "...";
+        dot.className = "px-1 text-stone-400 text-xs";
+        container.appendChild(dot);
+    }
+
+    // Render page number buttons
+    for (let i = startPage; i <= endPage; i++) {
+        container.appendChild(createPageBtn(i, i, false, i === currentPage));
+    }
+
+    // Show trailing "..." if pages after endPage exist
+    if (endPage < totalPages) {
+        const dot = document.createElement("span");
+        dot.innerText = "...";
+        dot.className = "px-1 text-stone-400 text-xs";
+        container.appendChild(dot);
+    }
+
+    // "Next" button
+    container.appendChild(
+        createPageBtn(">", currentPage + 1, currentPage === totalPages)
+    );
+
+    // Display current range information
+    const endIdx = startIdx + currentCount;
+    info.innerText = `Hiển thị ${
+        startIdx + 1
+    } - ${endIdx} trên tổng số ${totalItems} thành viên`;
+}
+
+function createPageBtn(text, targetPage, disabled, active = false) {
+    const btn = document.createElement("button");
+    btn.innerText = text;
+    btn.className = `page-link w-10 h-10 rounded-lg border border-orange-200 flex items-center justify-center font-bold text-sm transition-all ${
+        active ? "active" : "bg-white text-stone-600 hover:bg-orange-50"
+    } ${disabled ? "disabled" : ""}`;
+
+    if (!disabled && !active) {
+        btn.onclick = () =>
+            wrapWithLoader(() => {
+                currentPage = targetPage;
+                window.scrollTo({ top: 300, behavior: "smooth" });
+                updateDisplay();
+            });
+    }
+    return btn;
+}
+
+function updateGroupOptions(members) {
+    const select = document.getElementById("group-filter");
+    const currentVal = select.value;
+    const groups = [...new Set(members.map((m) => m.group))];
+    select.innerHTML = '<option value="all">Tất cả Nhóm</option>';
+    groups.forEach((g) => {
+        const opt = document.createElement("option");
+        opt.value = g;
+        opt.textContent = g;
+        if (g === currentVal) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+
 function applyFilters(members) {
     return members.filter((item) => {
         const matchesSearch = item.fullName
@@ -197,31 +323,6 @@ function applyFilters(members) {
             item.group.toLowerCase().includes(groupFilter.toLowerCase());
         return matchesSearch && matchesGroup;
     });
-}
-
-function renderPaginationUI(totalPages, totalItems, startIdx, currentCount) {
-    const container = document.getElementById("pagination-numbers");
-    const info = document.getElementById("pagination-info");
-    container.innerHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-        const btn = document.createElement("button");
-        btn.innerText = i;
-        btn.className = `page-link w-10 h-10 rounded-lg border border-orange-200 flex items-center justify-center font-bold text-sm transition-all hover:bg-orange-50 ${
-            i === currentPage ? "active" : "bg-white text-stone-600"
-        }`;
-        btn.onclick = () => {
-            currentPage = i;
-            window.scrollTo({ top: 300, behavior: "smooth" });
-            updateDisplay();
-        };
-        container.appendChild(btn);
-    }
-
-    const endIdx = startIdx + currentCount;
-    info.innerText = `Hiển thị ${
-        startIdx + 1
-    } - ${endIdx} trên tổng số ${totalItems} thành viên`;
 }
 
 function applySearch(members) {
