@@ -140,3 +140,52 @@ select:focus {
         opacity: 1;
     }
 }
+
+#global-loader {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 250, 245, 0.95);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease-out, visibility 0.4s;
+}
+
+.loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #ffedd5;
+    border-top: 3px solid #f97316;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.page-link.active {
+    background-color: #fb923c;
+    color: white;
+    border-color: #fb923c;
+}
+
+.page-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
