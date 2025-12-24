@@ -4,6 +4,7 @@
  */
 const MemberService = (() => {
     const CACHE = {
+        2026: null,
         2025: null,
         2024: null,
         2023: null,
