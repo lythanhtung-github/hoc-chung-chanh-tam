@@ -1,19 +1,21 @@
 /* =======================
     STATE
 ======================= */
-let currentYear = Constant.EMPTY;
+let allYears = MemberService.getAllYears();
+let currentYear = allYears[0];
 let searchQuery = Constant.EMPTY;
 let groupFilter = Constant.ALL;
 let sortType = Constant.NONE;
 let itemsPerPage = Constant.ITEMS_PER_PAGE;
 let currentPage = 1;
+let yearPageIndex = 0;
 
 /* =======================
     INITIALIZATION
 ======================= */
 window.onload = async () => {
     await wrapWithLoader(async () => {
-        renderTabs();
+        renderYearTabs();
     });
 
     initLotusEffect();
@@ -94,7 +96,7 @@ function updateMusicUI(isPlaying) {
 
     if (isPlaying) {
         icon.classList.add("music-pulse");
-        tooltip.textContent = "Tắt nhạc thiền";
+        tooltip.textContent = "Tắt nhạc";
         icon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -102,7 +104,7 @@ function updateMusicUI(isPlaying) {
         `;
     } else {
         icon.classList.remove("music-pulse");
-        tooltip.textContent = "Bật nhạc thiền";
+        tooltip.textContent = "Bật nhạc";
         icon.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
@@ -113,34 +115,69 @@ function updateMusicUI(isPlaying) {
 }
 
 /* =======================
-    YEAR TABS RENDERING
+    RENDER YEAR TABS
 ======================= */
-async function renderTabs() {
-    const container = document.getElementById("tabs-container");
-    const years = MemberService.getAllYears();
-    container.innerHTML = Constant.EMPTY;
-    if (!years.length) return;
+function getLimit() {
+    return window.innerWidth < 768
+        ? Constant.TAB_LIMITS.MOBILE
+        : Constant.TAB_LIMITS.DESKTOP;
+}
 
-    years.forEach((year, index) => {
+function updateYearPageIndex() {
+    const limit = getLimit();
+    const index = allYears.indexOf(currentYear);
+    yearPageIndex = Math.floor(index / limit);
+}
+
+async function renderYearTabs() {
+    const container = document.getElementById("tabs-container");
+    const prevBtn = document.getElementById("prev-years");
+    const nextBtn = document.getElementById("next-years");
+
+    const limit = getLimit();
+    const start = yearPageIndex * limit;
+    const visibleYears = allYears.slice(start, start + limit);
+
+    container.innerHTML = Constant.EMPTY;
+    visibleYears.forEach((year) => {
         const btn = document.createElement("button");
         btn.innerText = year;
-        btn.className = `tab-btn px-8 py-3 rounded-xl border border-transparent font-bold text-stone-600 hover:text-orange-600 transition-all ${
-            index === 0 ? "active" : ""
+        btn.className = `tab-btn px-4 md:px-8 py-2 md:py-3 rounded-xl border-2 border-transparent font-bold text-sm md:text-base text-stone-600 transition-all ${
+            year === currentYear ? "active" : "hover:text-orange-600"
         }`;
         btn.onclick = async () => {
             currentYear = year;
             currentPage = 1;
-            document
-                .querySelectorAll(".tab-btn")
-                .forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
-            await updateDisplay();
+            renderYearTabs();
+            await wrapWithLoader(updateDisplay);
         };
         container.appendChild(btn);
     });
-    currentYear = years[0];
+
+    prevBtn.disabled = yearPageIndex === 0;
+    nextBtn.disabled = start + limit >= allYears.length;
+
+    prevBtn.onclick = () => {
+        if (yearPageIndex > 0) {
+            yearPageIndex--;
+            renderYearTabs();
+        }
+    };
+
+    nextBtn.onclick = () => {
+        if ((yearPageIndex + 1) * limit < allYears.length) {
+            yearPageIndex++;
+            renderYearTabs();
+        }
+    };
+
     await updateDisplay();
 }
+
+window.onresize = () => {
+    updateYearPageIndex();
+    renderYearTabs();
+};
 
 /* =======================
     MEMBER LIST & PAGINATION
@@ -161,8 +198,8 @@ async function updateDisplay() {
 
     if (!members.length) {
         grid.innerHTML = getEmptyTemplate();
-        paginNumbers.innerHTML = "";
-        paginInfo.innerHTML = "";
+        paginNumbers.innerHTML = Constant.EMPTY;
+        paginInfo.innerHTML = Constant.EMPTY;
         return;
     }
 
@@ -340,11 +377,11 @@ function applySearch(members) {
 }
 
 function applySort(members) {
-    if (sortType === "name-asc") {
+    if (sortType === Constant.NAME_ASC) {
         return [...members].sort((a, b) => a.name.localeCompare(b.name, "vi"));
     }
 
-    if (sortType === "name-desc") {
+    if (sortType === Constant.NAME_DESC) {
         return [...members].sort((a, b) => b.name.localeCompare(a.name, "vi"));
     }
 
