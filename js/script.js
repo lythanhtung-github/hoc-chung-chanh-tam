@@ -21,6 +21,7 @@ window.onload = async () => {
     initLotusEffect();
     initMusic();
     initEvents();
+    lucide.createIcons();
 };
 
 const showLoader = () =>
