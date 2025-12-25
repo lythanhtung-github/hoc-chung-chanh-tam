@@ -392,10 +392,12 @@ function applySort(members) {
     UI RENDER HELPERS
 ======================= */
 function renderMemberCard(m) {
+    const imageSrc = (m.img && m.img.trim() !== "") ? m.img : Constant.DEFAULT_AVATAR;
+
     return `
         <div class="profile-card fade-in">
             <div class="image-outer img-skeleton">
-                <img src="${m.img}" loading="lazy" alt="${m.fullName}" class="profile-img opacity-0" width="150" height="150"
+                <img src="${imageSrc}" loading="lazy" alt="${m.fullName}" class="profile-img opacity-0" width="150" height="150"
                 onload="this.classList.remove('opacity-0'); this.parentElement.classList.remove('img-skeleton');">
             </div>
             <h2 class="text-lg font-bold text-stone-800 mb-1 text-center">${m.fullName}</h2>
