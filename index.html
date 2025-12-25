@@ -64,10 +64,12 @@
             href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&family=Noto+Serif+Vietnamese:wght@400;700&display=swap"
             rel="stylesheet" />
 
+        <!-- Lucide Icons -->
+        <script src="https://unpkg.com/lucide@latest"></script>
         <!-- Main Styles -->
         <link rel="stylesheet" href="./css/style.css" />
     </head>
-    <body class="p-4 md:p-12">
+    <body class="p-4 md:p-8">
         <!-- Loader -->
         <div id="global-loader">
             <div class="loader-circle mb-4"></div>
@@ -254,9 +256,63 @@
                 <p id="pagination-info" class="text-stone-400 text-xs"></p>
             </div>
 
-            <footer
-                class="mt-8 text-center text-stone-400 text-sm font-serif border-t border-orange-100 pt-8">
-                <p>© Học chúng Chánh Tâm - Tự viện Phước Duyên, Huế</p>
+            <footer class="mt-5 border-t border-orange-100 pt-5">
+                <div class="flex flex-col items-center text-center">
+                    <div
+                        class="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 w-full justify-center">
+                        <div class="footer-logo-container">
+                            <img
+                                src="./assets/image/logo.png"
+                                alt="Logo Chánh Tâm"
+                                class="footer-logo-img" />
+                        </div>
+
+                        <div class="text-center md:text-left">
+                            <h2 class="text-2xl font-bold text-orange-900 mb-1">
+                                Học Chúng Chánh Tâm
+                            </h2>
+                            <div
+                                class="flex items-center justify-center md:justify-start gap-2 text-stone-500">
+                                <i
+                                    data-lucide="map-pin"
+                                    class="w-4 h-4 text-orange-400"></i>
+                                <span class="font-medium"
+                                    >Tự viện Phước Duyên, TP. Huế</span
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="flex gap-4 mb-6">
+                        <!-- Facebook Link -->
+                        <a
+                            href="https://www.facebook.com/hocchungchanhtam"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="footer-social-link w-12 h-12 rounded-full border border-orange-200 flex items-center justify-center text-orange-600 shadow-sm"
+                            title="Theo dõi chúng tôi trên Facebook">
+                            <i data-lucide="facebook" class="w-6 h-6"></i>
+                        </a>
+
+                        <!-- Youtube Link -->
+                        <a
+                            href="https://www.youtube.com/@HOCCHUNGCHANHTAM"
+                            target="_blank"
+                            class="footer-social-link w-12 h-12 rounded-full border border-orange-200 flex items-center justify-center text-orange-600 shadow-sm"
+                            title="Youtube">
+                            <i data-lucide="youtube" class="w-6 h-6"></i>
+                        </a>
+
+                        <!-- Mail Link -->
+                        <a
+                            href="#"
+                            class="footer-social-link w-12 h-12 rounded-full border border-orange-200 flex items-center justify-center text-orange-600 shadow-sm"
+                            title="Gửi Email">
+                            <i data-lucide="mail" class="w-6 h-6"></i>
+                        </a>
+                    </div>
+                </div>
             </footer>
         </div>
 
