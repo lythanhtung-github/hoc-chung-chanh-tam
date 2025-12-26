@@ -2,7 +2,7 @@
     STATE
 ======================= */
 let allYears = MemberService.getAllYears();
-let currentYear = 2026;
+let currentYear = new Date().getFullYear();
 let searchQuery = Constant.EMPTY;
 let groupFilter = Constant.ALL;
 let sortType = Constant.NONE;
